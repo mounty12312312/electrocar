@@ -1,0 +1,22 @@
+/* index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply min-h-screen bg-gray-50;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+@layer base {
+  button {
+    /* Убираем ring и outline */
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  button:active {
+    /* Новый стиль: легкое затемнение */
+    filter: brightness(0.92);
+    background-color: #e5e7eb; /* bg-gray-200 */
+  }
+}
