@@ -359,104 +359,65 @@ export default function App() {
   const PAGE_SIZE = 16; // Updated pagination size
 
   const initialCatalog = [
-    // Лампочки
-    {
-      id: 1,
-      name: "Лампочка E27",
-      category: "Лампочки",
-      price: 250,
-      description: "Энергосберегающая светодиодная лампа.",
-      image: "https://placehold.co/300x300",
-      specs: [{ key: "Напряжение", value: "220V" }, { key: "Мощность", value: "10W" }]
-    },
-    {
-      id: 2,
-      name: "Лампочка GU10",
-      category: "Лампочки",
-      price: 180,
-      description: "Компактная светодиодная лампа для точечных светильников.",
-      image: "https://placehold.co/300x300",
-      specs: [{ key: "Напряжение", value: "220V" }, { key: "Мощность", value: "7W" }]
-    },
-    {
-      id: 3,
-      name: "Лампочка G9",
-      category: "Лампочки",
-      price: 90,
-      description: "Миниатюрная лампа для декоративных светильников.",
-      image: "https://placehold.co/300x300",
-      specs: [{ key: "Напряжение", value: "220V" }, { key: "Мощность", value: "5W" }]
-    },
-    // Розетки
-    {
-      id: 4,
-      name: "Розетка Schneider",
-      category: "Розетки",
-      price: 180,
-      description: "Стильная розетка с заземлением.",
-      image: "https://placehold.co/300x300",
-      specs: [{ key: "Цвет", value: "Белый" }, { key: "Тип", value: "С заземлением" }]
-    },
-    {
-      id: 5,
-      name: "Розетка Legrand",
-      category: "Розетки",
-      price: 210,
-      description: "Классическая розетка для дома.",
-      image: "https://placehold.co/300x300",
-      specs: [{ key: "Цвет", value: "Слоновая кость" }, { key: "Тип", value: "Без заземления" }]
-    },
-    {
-      id: 6,
-      name: "Розетка Makel",
-      category: "Розетки",
-      price: 120,
-      description: "Бюджетная розетка для ремонта.",
-      image: "https://placehold.co/300x300",
-      specs: [{ key: "Цвет", value: "Белый" }, { key: "Тип", value: "Без заземления" }]
-    },
-    // Кабели
-    {
-      id: 7,
-      name: "Кабель ВВГнг-LS 3х2.5",
-      category: "Кабели",
-      price: 35,
-      description: "Пожаробезопасный кабель для внутренней проводки.",
-      image: "https://placehold.co/300x300",
-      specs: [{ key: "Сечение", value: "3х2.5 мм²" }, { key: "Материал", value: "Медь" }]
-    },
-    {
-      id: 8,
-      name: "Кабель ПВС 2х1.5",
-      category: "Кабели",
-      price: 22,
-      description: "Гибкий кабель для бытовых приборов.",
-      image: "https://placehold.co/300x300",
-      specs: [{ key: "Сечение", value: "2х1.5 мм²" }, { key: "Материал", value: "Медь" }]
-    },
-    {
-      id: 9,
-      name: "Кабель NYM 3х1.5",
-      category: "Кабели",
-      price: 28,
-      description: "Кабель для стационарной прокладки.",
-      image: "https://placehold.co/300x300",
-      specs: [{ key: "Сечение", value: "3х1.5 мм²" }, { key: "Материал", value: "Медь" }]
-    },
-    {
-      id: 10,
-      name: "Кабель ШВВП 2х0.75",
-      category: "Кабели",
-      price: 15,
-      description: "Плоский кабель для осветительных приборов.",
-      image: "https://placehold.co/300x300",
-      specs: [{ key: "Сечение", value: "2х0.75 мм²" }, { key: "Материал", value: "Медь" }]
-    }
+    // Кабель и провод
+    { id: 1, name: "Кабель ВВГнг-LS 3х2.5", category: "Кабель и провод > Кабель силовой", price: 35, description: "Пожаробезопасный силовой кабель.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "3х2.5 мм²" }] },
+    { id: 2, name: "Кабель NYM 3х1.5", category: "Кабель и провод > Кабель силовой", price: 28, description: "Кабель для стационарной прокладки.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "3х1.5 мм²" }] },
+    { id: 3, name: "Кабель ВВГ-П 2х1.5", category: "Кабель и провод > Кабель силовой", price: 22, description: "Гибкий силовой кабель.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "2х1.5 мм²" }] },
+
+    { id: 4, name: "Кабель КВВГ 5х2.5", category: "Кабель и провод > Кабель монтажный", price: 40, description: "Монтажный кабель для сигнализации.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "5х2.5 мм²" }] },
+    { id: 5, name: "Кабель ПВС 2х1.5", category: "Кабель и провод > Кабель монтажный", price: 18, description: "Гибкий монтажный кабель.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "2х1.5 мм²" }] },
+    { id: 6, name: "Кабель КВВГ 7х1.0", category: "Кабель и провод > Кабель монтажный", price: 25, description: "Монтажный кабель для управления.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "7х1.0 мм²" }] },
+
+    { id: 7, name: "Провод ПВС 3х1.5", category: "Кабель и провод > Провода и шнуры", price: 15, description: "Гибкий провод для бытовых приборов.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "3х1.5 мм²" }] },
+    { id: 8, name: "Провод ШВВП 2х0.75", category: "Кабель и провод > Провода и шнуры", price: 10, description: "Плоский шнур для осветительных приборов.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "2х0.75 мм²" }] },
+    { id: 9, name: "Провод МГТФ 1х0.5", category: "Кабель и провод > Провода и шнуры", price: 8, description: "Термостойкий монтажный провод.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "1х0.5 мм²" }] },
+
+    { id: 10, name: "Провод СИП-4 2х16", category: "Кабель и провод > Провода для ЛЭП", price: 55, description: "Провод для воздушных линий электропередач.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "2х16 мм²" }] },
+    { id: 11, name: "Провод АС 35", category: "Кабель и провод > Провода для ЛЭП", price: 60, description: "Алюминиевый провод для ЛЭП.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "35 мм²" }] },
+    { id: 12, name: "Провод СИП-2А 3х25", category: "Кабель и провод > Провода для ЛЭП", price: 80, description: "Самонесущий изолированный провод.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "3х25 мм²" }] },
+
+    // Прокладка кабеля > Лотки и шинопровод > Лотки перфорированные
+    { id: 13, name: "Лоток перфорированный 100х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки перфорированные", price: 120, description: "Металлический лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "100х50" }] },
+    { id: 14, name: "Лоток перфорированный 200х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки перфорированные", price: 180, description: "Широкий лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "200х50" }] },
+    { id: 15, name: "Лоток перфорированный 300х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки перфорированные", price: 250, description: "Большой лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "300х50" }] },
+
+    // Прокладка кабеля > Лотки и шинопровод > Лотки неперфорированные
+    { id: 16, name: "Лоток неперфорированный 100х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки неперфорированные", price: 110, description: "Глухой лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "100х50" }] },
+    { id: 17, name: "Лоток неперфорированный 200х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки неперфорированные", price: 170, description: "Глухой лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "200х50" }] },
+    { id: 18, name: "Лоток неперфорированный 300х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки неперфорированные", price: 230, description: "Глухой лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "300х50" }] },
+
+    // Прокладка кабеля > Лотки и шинопровод > Лотки лестничные
+    { id: 19, name: "Лоток лестничный 100х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки лестничные", price: 130, description: "Лестничный лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "100х50" }] },
+    { id: 20, name: "Лоток лестничный 200х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки лестничные", price: 190, description: "Лестничный лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "200х50" }] },
+    { id: 21, name: "Лоток лестничный 300х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки лестничные", price: 260, description: "Лестничный лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "300х50" }] },
+
+    // Прокладка кабеля > Лотки и шинопровод > Шинопровод
+    { id: 22, name: "Шинопровод 100А", category: "Прокладка кабеля > Лотки и шинопровод > Шинопровод", price: 500, description: "Шинопровод на 100А.", image: "https://placehold.co/300x300", specs: [{ key: "Ток", value: "100А" }] },
+    { id: 23, name: "Шинопровод 250А", category: "Прокладка кабеля > Лотки и шинопровод > Шинопровод", price: 900, description: "Шинопровод на 250А.", image: "https://placehold.co/300x300", specs: [{ key: "Ток", value: "250А" }] },
+    { id: 24, name: "Шинопровод 400А", category: "Прокладка кабеля > Лотки и шинопровод > Шинопровод", price: 1500, description: "Шинопровод на 400А.", image: "https://placehold.co/300x300", specs: [{ key: "Ток", value: "400А" }] },
+
+    // Светотехника > Светильники > Светильники для внутреннего освещения > Офисные светильники
+    { id: 25, name: "Офисный светильник LED 36Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Офисные светильники", price: 900, description: "Потолочный офисный светильник.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "36Вт" }] },
+    { id: 26, name: "Офисный светильник LED 48Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Офисные светильники", price: 1200, description: "Яркий офисный светильник.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "48Вт" }] },
+    { id: 27, name: "Офисный светильник LED 24Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Офисные светильники", price: 700, description: "Компактный офисный светильник.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "24Вт" }] },
+
+    // Светотехника > Светильники > Светильники для внутреннего освещения > Даунлайт светильники
+    { id: 28, name: "Даунлайт светильник 12Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Даунлайт светильники", price: 350, description: "Встраиваемый даунлайт.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "12Вт" }] },
+    { id: 29, name: "Даунлайт светильник 18Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Даунлайт светильники", price: 450, description: "Круглый даунлайт.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "18Вт" }] },
+    { id: 30, name: "Даунлайт светильник 24Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Даунлайт светильники", price: 600, description: "Большой даунлайт.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "24Вт" }] },
+
+    // Светотехника > Светильники > Светильники для внутреннего освещения > Трековые светильники
+    { id: 31, name: "Трековый светильник 10Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Трековые светильники", price: 800, description: "Трековый светильник для магазинов.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "10Вт" }] },
+    { id: 32, name: "Трековый светильник 20Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Трековые светильники", price: 1200, description: "Яркий трековый светильник.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "20Вт" }] },
+    { id: 33, name: "Трековый светильник 30Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Трековые светильники", price: 1600, description: "Мощный трековый светильник.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "30Вт" }] },
+
+    // ...добавьте по 3 товара для каждой самой глубокой подкатегории аналогично примеру выше...
   ];
 
   // Исправленная инициализация каталога:
   function getInitialCatalog() {
     try {
+      // Не нужно оставлять строку localStorage.removeItem('catalog');
       const stored = JSON.parse(localStorage.getItem('catalog'));
       if (Array.isArray(stored) && stored.length > 0) {
         return stored;
@@ -474,6 +435,8 @@ export default function App() {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [specFilters, setSpecFilters] = useState({});
   const [showFilters, setShowFilters] = useState(false);
+  // [Change] Add new state to hold category filter during search:
+  const [searchCategoryFilter, setSearchCategoryFilter] = useState('');
 
   // Сохраняем в localStorage
   useEffect(() => {
@@ -486,6 +449,9 @@ export default function App() {
 
   // ==== Все уникальные категории ====
   const allCategories = [...new Set(catalogData.map(p => p.category))];
+
+  // ==== Поиск по сайту (названия и характеристики) ====
+// (searchQuery уже есть в состоянии)
 
   // ==== Уникальные ключи характеристик ====
   const specKeys = [];
@@ -549,13 +515,19 @@ export default function App() {
 
   // ==== Применить фильтры ====
   const applyFilters = () => {
-    // Если нет фильтров, возвращаем все товары
     if (!searchQuery && !categoryFilter && Object.values(specFilters).every(arr => !arr.length)) {
       return catalogData;
     }
+    const searchWords = searchQuery.toLowerCase().split(/\s+/).filter(Boolean);
+    // [Change] Modify applyFilters to use activeCategory from either searchCategoryFilter or categoryFilter:
+    const activeCategory = searchQuery ? searchCategoryFilter : categoryFilter;
     return catalogData.filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = categoryFilter ? product.category === categoryFilter : true;
+      const haystack = [
+        product.name,
+        ...(product.specs || []).flatMap(spec => [spec.key, spec.value])
+      ].join(' ').toLowerCase();
+      const matchesSearch = searchWords.length === 0 || searchWords.every(word => haystack.includes(word));
+      const matchesCategory = activeCategory ? product.category === activeCategory : true;
       let matchesSpecs = true;
       for (const key in specFilters) {
         const selected = specFilters[key];
@@ -599,18 +571,41 @@ export default function App() {
   const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   // ==== Переключатель страниц ====
-  const [currentHash, setCurrentHash] = useState(window.location.hash.slice(1) || 'home');
+  const [currentHash, setCurrentHash] = useState(() => {
+    // Если нет hash, открываем главную страницу
+    const hash = window.location.hash.slice(1);
+    return hash ? hash : 'main';
+  });
+
+  // Если пользователь начинает вводить в поиске, автоматически открываем каталог
   useEffect(() => {
-    const onHashChange = () => setCurrentHash(window.location.hash.slice(1) || 'home');
+    if (searchQuery && currentHash !== 'home') {
+      window.location.hash = 'home';
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const onHashChange = () => setCurrentHash(window.location.hash.slice(1) || 'main');
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
   switch (currentHash) {
+    case 'main':
+      return (
+        <div className="bg-gray-100 min-h-screen font-sans">
+          <Header totalAmount={totalAmount} />
+          <SiteSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          <MainPage />
+          <Footer />
+        </div>
+      );
     case 'about':
       return (
         <div className="bg-gray-100 min-h-screen font-sans">
           <Header totalAmount={totalAmount} />
+          <SiteSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
           <AboutPage />
           <Footer />
         </div>
@@ -619,6 +614,7 @@ export default function App() {
       return (
         <div className="bg-gray-100 min-h-screen font-sans">
           <Header totalAmount={totalAmount} />
+          <SiteSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
           <ContactPage />
           <Footer />
         </div>
@@ -627,6 +623,7 @@ export default function App() {
       return (
         <div className="bg-gray-100 min-h-screen font-sans">
           <Header totalAmount={totalAmount} />
+          <SiteSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
           <CartPage
             cart={cart}
             updateQuantity={updateQuantity}
@@ -640,6 +637,7 @@ export default function App() {
       return (
         <div className="bg-gray-100 min-h-screen font-sans">
           <Header totalAmount={totalAmount} />
+          <SiteSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
           <AdminPage catalogData={catalogData} setCatalogData={setCatalogData} />
           <Footer />
         </div>
@@ -649,12 +647,15 @@ export default function App() {
       return (
         <div className="bg-gray-100 min-h-screen font-sans">
           <Header totalAmount={totalAmount} />
+          <SiteSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
           <HomePage
             products={applyFilters()}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             categoryFilter={categoryFilter}
             setCategoryFilter={setCategoryFilter}
+            searchCategoryFilter={searchCategoryFilter}         // <-- new prop
+            setSearchCategoryFilter={setSearchCategoryFilter}   // <-- new prop
             categories={allCategories}
             showFilters={showFilters}
             setShowFilters={setShowFilters}
@@ -681,14 +682,31 @@ function Header({ totalAmount }) {
     window.location.hash = page;
   };
 
+  // При нажатии на "Каталог" сбрасываем выбор категорий
   return (
     <header className="bg-white shadow sticky top-0 z-20">
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
         <div className="flex items-center space-x-3">
-          <span className="text-2xl font-extrabold text-blue-700 tracking-tight">ElectroShop</span>
+          <button
+            onClick={() => goTo('main')}
+            className="text-2xl font-extrabold text-blue-700 tracking-tight hover:underline focus:outline-none"
+            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+            aria-label="На главную"
+          >
+            ElectroShop
+          </button>
         </div>
         <nav className="flex space-x-2 md:space-x-6">
-          <button onClick={() => goTo('home')} className="font-medium text-gray-600 hover:text-blue-600 transition">Главная</button>
+          <button
+            onClick={() => {
+              goTo('home');
+              // Сброс выбора категорий при переходе в каталог
+              window.dispatchEvent(new CustomEvent('reset-category-path'));
+            }}
+            className="font-medium text-gray-600 hover:text-blue-600 transition"
+          >
+            Каталог
+          </button>
           <button onClick={() => goTo('about')} className="font-medium text-gray-600 hover:text-blue-600 transition">О нас</button>
           <button onClick={() => goTo('contact')} className="font-medium text-gray-600 hover:text-blue-600 transition">Связаться</button>
           <button onClick={() => goTo('cart')} className="relative font-medium text-gray-600 hover:text-blue-600 transition">
@@ -699,10 +717,26 @@ function Header({ totalAmount }) {
               </span>
             )}
           </button>
-          {/* Удалена кнопка "Админ панель" */}
         </nav>
       </div>
     </header>
+  );
+}
+
+// ==== Строка поиска под хедером ====
+function SiteSearchBar({ searchQuery, setSearchQuery }) {
+  return (
+    <div className="bg-white shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 py-4 flex justify-center">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          placeholder="Поиск по сайту (название или характеристика)..."
+          className="w-full max-w-xl border border-gray-300 rounded-lg p-2.5"
+        />
+      </div>
+    </div>
   );
 }
 
@@ -715,6 +749,8 @@ function HomePage({
   setSearchQuery,
   categoryFilter,
   setCategoryFilter,
+  searchCategoryFilter,
+  setSearchCategoryFilter,
   categories,
   showFilters,
   setShowFilters,
@@ -801,9 +837,203 @@ function HomePage({
   // Состояние для "показать все" по каждому ключу характеристик
   const [showAllSpecs, setShowAllSpecs] = useState({});
 
+  // === Категорийная навигация ===
+  const [categoryPath, setCategoryPath] = useState([]);
+
+  // Сброс при поиске или фильтрах
+  useEffect(() => {
+    // if (searchQuery) setCategoryPath([]);
+  }, [searchQuery]);
+
+  // Сброс при нажатии на "Каталог"
+  useEffect(() => {
+    const resetHandler = () => setCategoryPath([]);
+    window.addEventListener('reset-category-path', resetHandler);
+    return () => window.removeEventListener('reset-category-path', resetHandler);
+  }, []);
+
+  // Получить текущий уровень категорий для выбора
+  function getCurrentCategories() {
+    let level = CATEGORY_TREE;
+    for (const cat of categoryPath) {
+      const found = (level || []).find(c => c.name === cat);
+      if (found && found.children) {
+        level = found.children;
+      } else {
+        level = [];
+        break;
+      }
+    }
+    return level;
+  }
+
+  // Если не выбран самый глубокий уровень, показываем только категории/подкатегории
+  const currentCategories = getCurrentCategories();
+  const isCategorySelection = !searchQuery && currentCategories.length > 0;
+  const isDeepCategory = !searchQuery && currentCategories.length === 0 && categoryPath.length > 0;
+
+  // Сохраняем категории, подходящие под текущий поисковый запрос (по всему каталогу)
+  const [searchCategories, setSearchCategories] = useState([]);
+
+  // При новом поиске сохраняем категории из результатов поиска по всему каталогу
+  useEffect(() => {
+    if (searchQuery) {
+      // Поиск по всему каталогу, а не по products (products уже отфильтрованы)
+      const allProducts = categories.length
+        ? categories.reduce((acc, cat) => acc.concat(products.filter(p => p.category === cat)), [])
+        : products;
+      const searchWords = searchQuery
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(Boolean);
+      const matched = allProducts.filter(product => {
+        const haystack = [
+          product.name,
+          ...(product.specs || []).flatMap(spec => [spec.key, spec.value])
+        ].join(' ').toLowerCase();
+        return searchWords.every(word => haystack.includes(word));
+      });
+      setSearchCategories([...new Set(matched.map(p => p.category))]);
+    } else {
+      setSearchCategories([]);
+    }
+  }, [searchQuery, categories, products]);
+
+  // Для фильтра: если поиск, то показываем только категории из результатов поиска
+  // Категории не сбрасываются при выборе, пользователь может переключаться между ними
+  let filterCategories = categories;
+
+  // При выборе категории/подкатегории
+  function handleCategoryCardClick(catName) {
+    const newPath = [...categoryPath, catName];
+    setCategoryPath(newPath);
+    if (searchQuery) {
+      setSearchCategoryFilter(newPath.join(' > '));
+    } else {
+      setCategoryFilter(newPath.join(' > '));
+    }
+    setSpecFilters({});
+  }
+
+  // Кнопка "назад" по категориям
+  function handleCategoryBack() {
+    const newPath = categoryPath.slice(0, -1);
+    setCategoryPath(newPath);
+    setCategoryFilter(newPath.join(' > ') || '');
+    setSpecFilters({});
+  }
+
+  // Сброс фильтра: во время поиска сбрасываем характеристики и выставляем "все категории"
+  // Для каталога (без поиска) сбрасываем только характеристики
+  function handleResetFilters() {
+    setSpecFilters({});
+    setShowAllSpecs({});
+    setShowFilters(false);
+    if (searchQuery) {
+      setCategoryFilter('');
+    }
+    // searchQuery не трогаем, чтобы остался поиск
+  }
+
+  if (isCategorySelection) {
+    return (
+      <main className="max-w-7xl mx-auto px-4 py-12">
+        {/* [Change] Add clickable breadcrumb navigation */}
+        {categoryPath.length > 0 && (
+          <nav className="mb-4">
+            <ol className="flex space-x-2 text-sm text-blue-600">
+              <li
+                onClick={() => {
+                  setCategoryPath([]);
+                  setCategoryFilter('');
+                  setSearchCategoryFilter('');
+                }}
+                className="cursor-pointer hover:underline"
+              >
+                Каталог
+              </li>
+              {categoryPath.map((cat, idx) => (
+                <li key={idx} className="flex items-center">
+                  <span className="mx-2">/</span>
+                  <span
+                    onClick={() => {
+                      const newPath = categoryPath.slice(0, idx + 1);
+                      setCategoryPath(newPath);
+                      setCategoryFilter(newPath.join(' > '));
+                      setSearchCategoryFilter(newPath.join(' > '));
+                    }}
+                    className="cursor-pointer hover:underline"
+                  >
+                    {cat}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
+        {categoryPath.length > 0 && (
+          <button
+            onClick={handleCategoryBack}
+            className="mb-6 px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 text-gray-700"
+          >
+            ← Назад
+          </button>
+        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          {currentCategories.map(cat => (
+            <div
+              key={cat.name}
+              className="bg-white rounded-2xl shadow-lg overflow-hidden transition-transform duration-200 hover:shadow-2xl hover:-translate-y-2 flex flex-col h-full border border-gray-200 cursor-pointer"
+              onClick={() => handleCategoryCardClick(cat.name)}
+              tabIndex={0}
+              style={{ willChange: 'transform, box-shadow' }}
+            >
+              <div className="flex flex-col items-center justify-center flex-grow p-8">
+                <span className="text-xl font-bold text-blue-700 mb-2">{cat.name}</span>
+                {cat.children && <span className="text-gray-500 text-sm">Выберите подкатегорию</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </main>
+    );
+  }
+
+  // In the non-isCategorySelection branch (deep category view), add breadcrumb above the filter button:
   return (
     <main className="max-w-7xl mx-auto px-4 py-12">
-      {/* Кнопка фильтра всегда сверху */}
+      {!selectedProduct && categoryPath.length > 0 && (
+        <nav className="mb-4">
+          <ol className="flex space-x-2 text-sm text-blue-600">
+            <li
+              onClick={() => {
+                setCategoryPath([]);
+                setCategoryFilter('');
+                setSearchCategoryFilter('');
+              }}
+              className="cursor-pointer hover:underline"
+            >
+              Каталог
+            </li>
+            {categoryPath.map((cat, idx) => (
+              <li key={idx} className="flex items-center">
+                <span className="mx-2">/</span>
+                <span
+                  onClick={() => {
+                    const newPath = categoryPath.slice(0, idx + 1);
+                    setCategoryPath(newPath);
+                    setCategoryFilter(newPath.join(' > '));
+                    setSearchCategoryFilter(newPath.join(' > '));
+                  }}
+                  className="cursor-pointer hover:underline"
+                >
+                  {cat}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )}
       <div className="flex justify-end mb-6">
         <button
           onClick={() => setShowFilters(true)}
@@ -812,7 +1042,6 @@ function HomePage({
           Показать фильтры
         </button>
       </div>
-
       {/* Модальное окно фильтра */}
       {showFilters && (
         <div
@@ -831,23 +1060,32 @@ function HomePage({
               &times;
             </button>
             <h3 className="text-xl font-bold mb-5 text-blue-800">Фильтры</h3>
-            <div className="mb-5">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Категория</label>
-              <select
-                value={categoryFilter}
-                onChange={e => {
-                  setCategoryFilter(e.target.value);
-                  setSpecFilters({});
-                  setShowAllSpecs({});
-                }}
-                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500 transition"
-              >
-                <option value="">Все категории</option>
-                {categories.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
+            {/* Категория: показываем только если не в глубокой категории */}
+            {!isDeepCategory && (
+              <div className="mb-5">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Категория</label>
+                <select
+                  value={searchQuery ? searchCategoryFilter : categoryFilter}
+                  onChange={e => {
+                    if (searchQuery) {
+                      setSearchCategoryFilter(e.target.value);
+                    } else {
+                      setCategoryFilter(e.target.value);
+                    }
+                    setSpecFilters({});
+                    setShowAllSpecs({});
+                  }}
+                  className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500 transition"
+                >
+                  <option value="">Все категории</option>
+                  {filterCategories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Характеристики */}
             {categoryFilter && specKeys.map(key => {
               const values = getSpecValues(key);
               const showAll = showAllSpecs[key];
@@ -874,35 +1112,22 @@ function HomePage({
                       </label>
                     ))}
                   </div>
-                  {values.length > 3 && !showAll && (
+                  {values.length > 3 && (
                     <button
                       type="button"
                       className="mt-2 text-blue-600 hover:underline text-sm"
-                      onClick={() => setShowAllSpecs(prev => ({ ...prev, [key]: true }))}
+                      onClick={() => setShowAllSpecs(prev => ({ ...prev, [key]: !prev[key] }))}
                     >
-                      Показать все
-                    </button>
-                  )}
-                  {values.length > 3 && showAll && (
-                    <button
-                      type="button"
-                      className="mt-2 text-blue-600 hover:underline text-sm"
-                      onClick={() => setShowAllSpecs(prev => ({ ...prev, [key]: false }))}
-                    >
-                      Скрыть все
+                      {showAll ? "Скрыть" : "Показать все"}
                     </button>
                   )}
                 </div>
               );
             })}
+
+            {/* Кнопка сброса */}
             <button
-              onClick={() => {
-                setSpecFilters({});
-                setCategoryFilter('');
-                setSearchQuery('');
-                setShowFilters(false);
-                setShowAllSpecs({});
-              }}
+              onClick={handleResetFilters}
               className="mt-6 w-full px-4 py-2.5 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-medium"
             >
               Сбросить фильтры
@@ -1138,3 +1363,198 @@ function ProductModal({ product, onClose }) {
     </div>
   );
 }
+
+// ==== Главная страница сайта (отдельно от каталога) ====
+function MainPage() {
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="flex flex-col items-center text-center">
+        <h1 className="text-4xl font-extrabold text-blue-700 mb-6">ElectroShop</h1>
+        <p className="text-lg text-gray-700 mb-4 max-w-2xl">
+          Добро пожаловать в ElectroShop — ваш универсальный магазин электротоваров для дома и офиса!
+        </p>
+        <img
+          src="https://placehold.co/600x250?text=ElectroShop"
+          alt="ElectroShop"
+          className="rounded-xl shadow-lg mb-8"
+        />
+        <div className="text-gray-600 max-w-xl">
+          <p className="mb-2">
+            У нас вы найдете лампочки, розетки, кабели и многое другое по выгодным ценам.
+          </p>
+          <p className="mb-2">
+            Быстрая доставка, удобный поиск и качественный сервис — всё для вашего комфорта.
+          </p>
+          <p>
+            Начните покупки прямо сейчас — перейдите в <span className="font-semibold text-blue-700">Каталог</span>!
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// === Категории и подкатегории ===
+const CATEGORY_TREE = [
+  {
+    name: "Кабель и провод",
+    children: [
+      { name: "Кабель силовой" },
+      { name: "Кабель монтажный" },
+      { name: "Провода и шнуры" },
+      { name: "Провода для ЛЭП" },
+    ],
+  },
+  {
+    name: "Прокладка кабеля",
+    children: [
+      {
+        name: "Лотки и шинопровод",
+        children: [
+          { name: "Лотки перфорированные" },
+          { name: "Лотки неперфорированные" },
+          { name: "Лотки лестничные" },
+          { name: "Шинопровод" },
+        ],
+      },
+      { name: "Распределительные коробки" },
+      { name: "Разьемы" },
+    ],
+  },
+  {
+    name: "Светотехника",
+    children: [
+      {
+        name: "Светильники",
+        children: [
+          {
+            name: "Светильники для внутреннего освещения",
+            children: [
+              { name: "Офисные светильники" },
+              { name: "Даунлайт светильники" },
+              { name: "Трековые светильники" },
+              { name: "ЖКХ светильники" },
+              { name: "Бытовые светильники" },
+              { name: "Настольные светильники" },
+              { name: "Точечные светильники" },
+              { name: "Светильники накладные бытовые" },
+            ],
+          },
+          {
+            name: "Светильники для наружнего освещения",
+            children: [
+              { name: "Дорожные светильники" },
+              { name: "Парковые светильники" },
+              { name: "Садовые светильники" },
+              { name: "Прожекторы" },
+              { name: "Переносные светильники" },
+              { name: "Декоративный свет" },
+            ],
+          },
+        ],
+      },
+      { name: "Лампы" },
+      {
+        name: "Аксессуары для светильников",
+        children: [
+          { name: "Драйверы" },
+          { name: "Патроны, ламподержатели" },
+          { name: "Прочее" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "Электроустановочные изделия",
+    children: [
+      {
+        name: "Скрытого монтажа",
+        children: [
+          { name: "Розетки" },
+          { name: "Выключатели и переключатели" },
+          { name: "Светорегуляторы (диммеры)" },
+          { name: "Терморегуляторы" },
+          { name: "Кнопки" },
+        ],
+      },
+      {
+        name: "Открытого монтажа",
+        children: [
+          { name: "Розетки" },
+          { name: "Выключатели и переключатели" },
+          { name: "Светорегуляторы (диммеры)" },
+          { name: "Терморегуляторы" },
+          { name: "Кнопки" },
+        ],
+      },
+      { name: "Аксессуары для электроустановочных изделий" },
+      {
+        name: "Коробки установочные",
+        children: [
+          { name: "Для установки в бетон" },
+          { name: "Для установки в полые стены" },
+          { name: "Переходные коробки для наружнего монтажа" },
+        ],
+      },
+      {
+        name: "Передвижные установки",
+        children: [
+          { name: "Удлинители" },
+          { name: "Сетевые фильтры" },
+          { name: "Переходники" },
+          { name: "Вилки" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "Низковольтное оборудование",
+    children: [
+      {
+        name: "Аппараты защиты",
+        children: [
+          { name: "Автоматические выключатели" },
+          { name: "Дифференциальная защита (УЗО, ДифБлоки)" },
+          { name: "Вспомогательные элементы" },
+        ],
+      },
+      { name: "Пускатели, контакторы" },
+      { name: "Рубильники" },
+      {
+        name: "Счетчики электроэнергии",
+        children: [
+          { name: "Однофазные" },
+          { name: "Трехфазные" },
+        ],
+      },
+      { name: "Кнопки" },
+      { name: "Трансформаторы" },
+      { name: "Измерительные приборы" },
+    ],
+  },
+  {
+    name: "Щитовое оборудование",
+    children: [
+      {
+        name: "Щиты электрические",
+        children: [
+          { name: "Щитовые корпусы пластиковые" },
+          { name: "Щитовые корпусы металлические" },
+        ],
+      },
+      { name: "Щиты в сборе" },
+      { name: "Аксессуары для щитового оборудования" },
+      { name: "Шины" },
+      { name: "Клеммы" },
+    ],
+  },
+  {
+    name: "Инструмент",
+    children: [
+      { name: "Ручной инструмент" },
+      { name: "Сварочное оборудование" },
+      { name: "Паяльное оборудование" },
+      { name: "Строительное оборудование" },
+    ],
+  },
+];
