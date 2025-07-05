@@ -1,4 +1,52 @@
 import React, { useState, useEffect } from 'react';
+import initialCatalog from './catalogData';
+import categorySpecs from './categorySpecs';
+
+// === Жесткая привязка обязательных категорий к обязательным характеристикам ===
+const REQUIRED_CATEGORY_SPECS = {
+  "Кабель и провод > Кабель силовой": ["Сечение"],
+  "Кабель и провод > Кабель монтажный": ["Сечение"],
+  "Кабель и провод > Провода и шнуры": ["Сечение"],
+  "Кабель и провод > Провода для ЛЭП": ["Сечение"],
+  "Прокладка кабеля > Лотки > Лотки перфорированные": ["Размер"],
+  "Прокладка кабеля > Лотки > Лотки неперфорированные": ["Размер"],
+  "Прокладка кабеля > Шинопровод": ["Ток"],
+  "Светотехника > Светильники > Светильники для внутреннего освещения > Офисные светильники": ["Мощность"],
+  "Светотехника > Лампы": ["Мощность"],
+  // ...добавьте остальные обязательные категории и их обязательные характеристики...
+};
+
+// === ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ: Получение обязательных характеристик с учетом наследования ===
+function getRequiredSpecsForCategory(categoryPath) {
+  if (!categoryPath) return [];
+  const parts = categoryPath.split(' > ');
+  for (let i = parts.length; i > 0; i--) {
+    const path = parts.slice(0, i).join(' > ');
+    if (REQUIRED_CATEGORY_SPECS[path]) {
+      return REQUIRED_CATEGORY_SPECS[path];
+    }
+  }
+  return [];
+}
+
+// === Утилита для поиска характеристик по всем уровням категории ===
+function getSpecsForCategory(categoryPath) {
+  if (!categoryPath) return [];
+  const parts = categoryPath.split(' > ');
+  let result = [];
+  for (let i = 1; i <= parts.length; i++) {
+    const path = parts.slice(0, i).join(' > ');
+    if (categorySpecs[path]) result = result.concat(categorySpecs[path]);
+    else if (categorySpecs[parts[i-1]]) result = result.concat(categorySpecs[parts[i-1]]);
+  }
+  // Удаляем дубли по key
+  const seen = new Set();
+  return result.filter(spec => {
+    if (seen.has(spec.key)) return false;
+    seen.add(spec.key);
+    return true;
+  });
+}
 
 // Define a simple Footer component if it doesn't exist
 function Footer() {
@@ -37,67 +85,77 @@ function ContactPage() {
 }
 
 // Define a simple CartPage component if it doesn't exist
-function CartPage({ cart, updateQuantity, total, removeFromCart }) {
+function CartPage({ cart, updateQuantity, total, removeFromCart, setShowOrder }) {
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Корзина</h1>
       {cart.length === 0 ? (
         <p className="text-gray-600 text-center">Ваша корзина пуста.</p>
       ) : (
-        <div className="space-y-6">
-          {cart.map(item => (
-            <div
-              key={item.id}
-              className="flex items-center justify-between bg-white shadow-md rounded-lg p-4 border border-gray-200"
-            >
-              <div className="flex items-center space-x-4">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-16 h-16 object-cover rounded-lg"
-                />
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-800">{item.name}</h2>
-                  <p className="text-sm text-gray-600">Цена: {item.price} ₽</p>
+        <>
+          <div className="space-y-6">
+            {cart.map(item => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between bg-white shadow-md rounded-lg p-4 border border-gray-200"
+              >
+                <div className="flex items-center space-x-4">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-16 h-16 object-cover rounded-lg"
+                  />
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-800">{item.name}</h2>
+                    <p className="text-sm text-gray-600">Цена: {item.price} ₽</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={() => updateQuantity(item.id, -1)}
+                    className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
+                  >
+                    -
+                  </button>
+                  <span className="w-8 text-center font-semibold text-gray-800">
+                    {item.quantity}
+                  </span>
+                  <button
+                    onClick={() => updateQuantity(item.id, 1)}
+                    className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
+                  >
+                    +
+                  </button>
+                  <button
+                    onClick={() => removeFromCart(item.id)}
+                    className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                  >
+                    Удалить
+                  </button>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => updateQuantity(item.id, -1)}
-                  className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
-                >
-                  -
-                </button>
-                <span className="w-8 text-center font-semibold text-gray-800">
-                  {item.quantity}
-                </span>
-                <button
-                  onClick={() => updateQuantity(item.id, 1)}
-                  className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
-                >
-                  +
-                </button>
-                <button
-                  onClick={() => removeFromCart(item.id)}
-                  className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-                >
-                  Удалить
-                </button>
-              </div>
+            ))}
+            <div className="text-right">
+              <p className="text-xl font-bold text-gray-800">
+                Общая сумма: <span className="text-blue-600">{total} ₽</span>
+              </p>
             </div>
-          ))}
-          <div className="text-right">
-            <p className="text-xl font-bold text-gray-800">
-              Общая сумма: <span className="text-blue-600">{total} ₽</span>
-            </p>
           </div>
-        </div>
+          <div className="flex justify-end mt-8">
+            <button
+              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 text-lg font-semibold shadow"
+              onClick={() => setShowOrder(true)}
+            >
+              Оформить заказ
+            </button>
+          </div>
+        </>
       )}
     </div>
   );
 }
 
-function AdminPage({ catalogData, setCatalogData }) {
+function AdminPage({ catalogData, setCatalogData, resetCatalog }) {
   const [editingProduct, setEditingProduct] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -105,27 +163,84 @@ function AdminPage({ catalogData, setCatalogData }) {
     price: '',
     description: '',
     specs: [],
+    image: '',
   });
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
   const [categoryInput, setCategoryInput] = useState(formData.category || '');
+  const [imagePreview, setImagePreview] = useState('');
 
-  const allCategories = [...new Set(catalogData.map((p) => p.category))];
+  // === Получить все возможные категории из CATEGORY_TREE ===
+  function getAllCategories(tree, prefix = '') {
+    let result = [];
+    for (const node of tree) {
+      const path = prefix ? prefix + ' > ' + node.name : node.name;
+      if (node.children && node.children.length) {
+        result = result.concat(getAllCategories(node.children, path));
+      } else {
+        result.push(path);
+      }
+    }
+    return result;
+  }
+  const allCategories = getAllCategories(CATEGORY_TREE);
 
   useEffect(() => {
     setCategoryInput(formData.category || '');
+  }, [formData.category]);
+
+  // --- При выборе категории подставлять обязательные характеристики ---
+  useEffect(() => {
+    if (formData.category) {
+      const required = getRequiredSpecsForCategory(formData.category);
+      if (required.length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          specs: required.map(key => ({ key, value: '' })),
+        }));
+      }
+    }
+  }, [formData.category]);
+
+  // --- При выборе категории подставлять все характеристики из дерева ---
+  useEffect(() => {
+    if (formData.category) {
+      const allSpecs = getSpecsForCategory(formData.category);
+      if (allSpecs.length > 0) {
+        setFormData(prev => {
+          // Сохраняем уже введённые значения по ключу
+          const prevMap = {};
+          (prev.specs || []).forEach(s => { prevMap[s.key] = s.value; });
+          return {
+            ...prev,
+            specs: allSpecs.map(spec => ({ key: spec.key, value: prevMap[spec.key] || '' })),
+          };
+        });
+      }
+    }
   }, [formData.category]);
 
   const filteredCategories = allCategories.filter(cat =>
     cat.toLowerCase().includes(categoryInput.toLowerCase())
   );
 
-  // --- FIX: define handleInputChange ---
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (name === "category") setCategoryInput(value);
   };
-  // --- end fix ---
+
+  // --- Загрузка фото ---
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setFormData(prev => ({ ...prev, image: ev.target.result }));
+        setImagePreview(ev.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const addSpec = () => {
     setFormData((prev) => ({
@@ -147,59 +262,60 @@ function AdminPage({ catalogData, setCatalogData }) {
     }));
   };
 
-  // Handle form submission
   const handleSubmit = () => {
     if (!formData.name || !formData.category || !formData.price || !formData.description) {
       alert('Заполните все поля!');
       return;
     }
-
     if (editingProduct) {
-      // Edit existing product
       setCatalogData((prev) =>
         prev.map((product) =>
           product.id === editingProduct.id ? { ...editingProduct, ...formData } : product
         )
       );
     } else {
-      // Add new product
       const newProduct = {
         id: Math.max(...catalogData.map((p) => p.id), 0) + 1,
         ...formData,
         price: parseFloat(formData.price),
-        image: 'https://placehold.co/300x300',
+        image: formData.image || 'https://placehold.co/300x300',
       };
       setCatalogData((prev) => [...prev, newProduct]);
     }
-
-    // Reset form
-    setFormData({ name: '', category: '', price: '', description: '', specs: [] });
+    setFormData({ name: '', category: '', price: '', description: '', specs: [], image: '' });
+    setImagePreview('');
     setEditingProduct(null);
   };
 
-  // Handle editing a product
   const handleEdit = (product) => {
     setEditingProduct(product);
     setFormData(product);
+    setImagePreview(product.image || '');
   };
 
-  // Handle deleting a product
   const handleDelete = (id) => {
     if (confirm('Вы уверены, что хотите удалить этот товар?')) {
       setCatalogData((prev) => prev.filter((product) => product.id !== id));
     }
   };
 
-  // Добавить функцию отмены редактирования
   const handleCancelEdit = () => {
     setEditingProduct(null);
-    setFormData({ name: '', category: '', price: '', description: '', specs: [] });
+    setFormData({ name: '', category: '', price: '', description: '', specs: [], image: '' });
     setCategoryInput('');
+    setImagePreview('');
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Управление каталогом</h1>
+      {/* Добавить кнопку сброса каталога */}
+      <button
+        onClick={resetCatalog}
+        className="mb-6 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+      >
+        Сбросить и обновить каталог
+      </button>
       {/* Form for adding/editing products */}
       <div className="bg-white shadow-md rounded-lg p-6 mb-8">
         <h2 className="text-xl font-bold text-gray-800 mb-4">
@@ -264,6 +380,14 @@ function AdminPage({ catalogData, setCatalogData }) {
             placeholder="Описание"
             className="w-full border border-gray-300 rounded-lg p-2.5"
           />
+          {/* --- Загрузка фото --- */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Фото товара</label>
+            <input type="file" accept="image/*" onChange={handleImageChange} />
+            {imagePreview && (
+              <img src={imagePreview} alt="Превью" className="mt-2 w-32 h-32 object-cover rounded-lg border" />
+            )}
+          </div>
           <div>
             <h3 className="font-semibold text-gray-800 mb-2">Характеристики</h3>
             {formData.specs.map((spec, index) => (
@@ -356,78 +480,10 @@ function AdminPage({ catalogData, setCatalogData }) {
 
 // Update App to include AdminPage
 export default function App() {
-  const PAGE_SIZE = 16; // Updated pagination size
+  const PAGE_SIZE = 16;
 
-  const initialCatalog = [
-    // Кабель и провод
-    { id: 1, name: "Кабель ВВГнг-LS 3х2.5", category: "Кабель и провод > Кабель силовой", price: 35, description: "Пожаробезопасный силовой кабель.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "3х2.5 мм²" }] },
-    { id: 2, name: "Кабель NYM 3х1.5", category: "Кабель и провод > Кабель силовой", price: 28, description: "Кабель для стационарной прокладки.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "3х1.5 мм²" }] },
-    { id: 3, name: "Кабель ВВГ-П 2х1.5", category: "Кабель и провод > Кабель силовой", price: 22, description: "Гибкий силовой кабель.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "2х1.5 мм²" }] },
-
-    { id: 4, name: "Кабель КВВГ 5х2.5", category: "Кабель и провод > Кабель монтажный", price: 40, description: "Монтажный кабель для сигнализации.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "5х2.5 мм²" }] },
-    { id: 5, name: "Кабель ПВС 2х1.5", category: "Кабель и провод > Кабель монтажный", price: 18, description: "Гибкий монтажный кабель.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "2х1.5 мм²" }] },
-    { id: 6, name: "Кабель КВВГ 7х1.0", category: "Кабель и провод > Кабель монтажный", price: 25, description: "Монтажный кабель для управления.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "7х1.0 мм²" }] },
-
-    { id: 7, name: "Провод ПВС 3х1.5", category: "Кабель и провод > Провода и шнуры", price: 15, description: "Гибкий провод для бытовых приборов.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "3х1.5 мм²" }] },
-    { id: 8, name: "Провод ШВВП 2х0.75", category: "Кабель и провод > Провода и шнуры", price: 10, description: "Плоский шнур для осветительных приборов.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "2х0.75 мм²" }] },
-    { id: 9, name: "Провод МГТФ 1х0.5", category: "Кабель и провод > Провода и шнуры", price: 8, description: "Термостойкий монтажный провод.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "1х0.5 мм²" }] },
-
-    { id: 10, name: "Провод СИП-4 2х16", category: "Кабель и провод > Провода для ЛЭП", price: 55, description: "Провод для воздушных линий электропередач.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "2х16 мм²" }] },
-    { id: 11, name: "Провод АС 35", category: "Кабель и провод > Провода для ЛЭП", price: 60, description: "Алюминиевый провод для ЛЭП.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "35 мм²" }] },
-    { id: 12, name: "Провод СИП-2А 3х25", category: "Кабель и провод > Провода для ЛЭП", price: 80, description: "Самонесущий изолированный провод.", image: "https://placehold.co/300x300", specs: [{ key: "Сечение", value: "3х25 мм²" }] },
-
-    // Прокладка кабеля > Лотки и шинопровод > Лотки перфорированные
-    { id: 13, name: "Лоток перфорированный 100х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки перфорированные", price: 120, description: "Металлический лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "100х50" }] },
-    { id: 14, name: "Лоток перфорированный 200х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки перфорированные", price: 180, description: "Широкий лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "200х50" }] },
-    { id: 15, name: "Лоток перфорированный 300х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки перфорированные", price: 250, description: "Большой лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "300х50" }] },
-
-    // Прокладка кабеля > Лотки и шинопровод > Лотки неперфорированные
-    { id: 16, name: "Лоток неперфорированный 100х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки неперфорированные", price: 110, description: "Глухой лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "100х50" }] },
-    { id: 17, name: "Лоток неперфорированный 200х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки неперфорированные", price: 170, description: "Глухой лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "200х50" }] },
-    { id: 18, name: "Лоток неперфорированный 300х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки неперфорированные", price: 230, description: "Глухой лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "300х50" }] },
-
-    // Прокладка кабеля > Лотки и шинопровод > Лотки лестничные
-    { id: 19, name: "Лоток лестничный 100х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки лестничные", price: 130, description: "Лестничный лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "100х50" }] },
-    { id: 20, name: "Лоток лестничный 200х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки лестничные", price: 190, description: "Лестничный лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "200х50" }] },
-    { id: 21, name: "Лоток лестничный 300х50", category: "Прокладка кабеля > Лотки и шинопровод > Лотки лестничные", price: 260, description: "Лестничный лоток для кабеля.", image: "https://placehold.co/300x300", specs: [{ key: "Размер", value: "300х50" }] },
-
-    // Прокладка кабеля > Лотки и шинопровод > Шинопровод
-    { id: 22, name: "Шинопровод 100А", category: "Прокладка кабеля > Лотки и шинопровод > Шинопровод", price: 500, description: "Шинопровод на 100А.", image: "https://placehold.co/300x300", specs: [{ key: "Ток", value: "100А" }] },
-    { id: 23, name: "Шинопровод 250А", category: "Прокладка кабеля > Лотки и шинопровод > Шинопровод", price: 900, description: "Шинопровод на 250А.", image: "https://placehold.co/300x300", specs: [{ key: "Ток", value: "250А" }] },
-    { id: 24, name: "Шинопровод 400А", category: "Прокладка кабеля > Лотки и шинопровод > Шинопровод", price: 1500, description: "Шинопровод на 400А.", image: "https://placehold.co/300x300", specs: [{ key: "Ток", value: "400А" }] },
-
-    // Светотехника > Светильники > Светильники для внутреннего освещения > Офисные светильники
-    { id: 25, name: "Офисный светильник LED 36Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Офисные светильники", price: 900, description: "Потолочный офисный светильник.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "36Вт" }] },
-    { id: 26, name: "Офисный светильник LED 48Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Офисные светильники", price: 1200, description: "Яркий офисный светильник.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "48Вт" }] },
-    { id: 27, name: "Офисный светильник LED 24Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Офисные светильники", price: 700, description: "Компактный офисный светильник.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "24Вт" }] },
-
-    // Светотехника > Светильники > Светильники для внутреннего освещения > Даунлайт светильники
-    { id: 28, name: "Даунлайт светильник 12Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Даунлайт светильники", price: 350, description: "Встраиваемый даунлайт.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "12Вт" }] },
-    { id: 29, name: "Даунлайт светильник 18Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Даунлайт светильники", price: 450, description: "Круглый даунлайт.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "18Вт" }] },
-    { id: 30, name: "Даунлайт светильник 24Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Даунлайт светильники", price: 600, description: "Большой даунлайт.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "24Вт" }] },
-
-    // Светотехника > Светильники > Светильники для внутреннего освещения > Трековые светильники
-    { id: 31, name: "Трековый светильник 10Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Трековые светильники", price: 800, description: "Трековый светильник для магазинов.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "10Вт" }] },
-    { id: 32, name: "Трековый светильник 20Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Трековые светильники", price: 1200, description: "Яркий трековый светильник.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "20Вт" }] },
-    { id: 33, name: "Трековый светильник 30Вт", category: "Светотехника > Светильники > Светильники для внутреннего освещения > Трековые светильники", price: 1600, description: "Мощный трековый светильник.", image: "https://placehold.co/300x300", specs: [{ key: "Мощность", value: "30Вт" }] },
-
-    // ...добавьте по 3 товара для каждой самой глубокой подкатегории аналогично примеру выше...
-  ];
-
-  // Исправленная инициализация каталога:
-  function getInitialCatalog() {
-    try {
-      // Не нужно оставлять строку localStorage.removeItem('catalog');
-      const stored = JSON.parse(localStorage.getItem('catalog'));
-      if (Array.isArray(stored) && stored.length > 0) {
-        return stored;
-      }
-    } catch (e) {}
-    return initialCatalog;
-  }
-
-  // Получаем данные из localStorage
-  const [catalogData, setCatalogData] = useState(getInitialCatalog());
+  // Инициализируем catalogData напрямую из импортированного initialCatalog
+  const [catalogData, setCatalogData] = useState(initialCatalog);
   const [cart, setCart] = useState(JSON.parse(localStorage.getItem('cart')) || []);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [editingCatalog, setEditingCatalog] = useState(false);
@@ -435,10 +491,111 @@ export default function App() {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [specFilters, setSpecFilters] = useState({});
   const [showFilters, setShowFilters] = useState(false);
-  // [Change] Add new state to hold category filter during search:
   const [searchCategoryFilter, setSearchCategoryFilter] = useState('');
 
-  // Сохраняем в localStorage
+  // Авторизация
+  const [user, setUser] = React.useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('user')) || null;
+    } catch {
+      return null;
+    }
+  });
+  const [showLogin, setShowLogin] = React.useState(false);
+  const [showRegister, setShowRegister] = React.useState(false);
+  const [loginError, setLoginError] = React.useState('');
+  const [registerError, setRegisterError] = React.useState('');
+
+  // ==== Пользователи ====
+  function getUsers() {
+    return [
+      {
+        username: 'kateh',
+        password: 'loveyou',
+        name: 'Администратор',
+        role: 'админ',
+      },
+    ];
+  }
+  function setUsers(users) {
+    localStorage.setItem('users', JSON.stringify(users));
+  }
+
+  // --- состояния для заказов и модалки ---
+  const [showOrder, setShowOrder] = React.useState(false);
+  const [orderLoading, setOrderLoading] = React.useState(false);
+  const [orderSuccess, setOrderSuccess] = React.useState(false);
+  const [orders, setOrders] = React.useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('orders')) || [];
+    } catch {
+      return [];
+    }
+  });
+
+  // --- обработка оформления заказа с отправкой в Telegram ---
+  function handleOrderSubmit(orderData) {
+    setOrderLoading(true);
+    // --- Формируем сообщение для Telegram ---
+    const tgToken = '7419050616:AAGhybYGXOS_PBzNNTuWcN8bYQ5uD3bVS68'; // TODO: заменить на реальный токен
+    const tgChatId = '7545991724';    // TODO: заменить на реальный chat_id
+    const itemsText = cart.map(i => `- ${i.name} — ${i.quantity} шт. × ${i.price} ₽`).join('\n');
+    const legalText = orderData.isLegalEntity ? 'Да' : 'Нет';
+    const orgInnText = orderData.isLegalEntity && orderData.orgInn ? `Организация/ИНН: ${orderData.orgInn}\n` : '';
+    const msg =
+      `Новый заказ!\n` +
+      `ФИО: ${orderData.name}\n` +
+      `Телефон: ${orderData.phone}\n` +
+      `Адрес: ${orderData.address}\n` +
+      (orderData.comment ? `Комментарий: ${orderData.comment}\n` : '') +
+      `Юридическое лицо/ИП: ${legalText}\n` +
+      orgInnText +
+      `Состав заказа:\n${itemsText}\n` +
+      `Сумма: ${cart.reduce((sum, i) => sum + i.price * i.quantity, 0)} ₽`;
+
+    // --- Отправка в Telegram ---
+    fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: tgChatId,
+        text: msg
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.ok) throw new Error('Ошибка отправки в Telegram');
+        // --- если успех, сохраняем заказ ---
+        setOrderLoading(false);
+        setShowOrder(false);
+        setOrderSuccess(true);
+        const newOrder = {
+          username: user?.username,
+          name: orderData.name,
+          phone: orderData.phone,
+          address: orderData.address,
+          comment: orderData.comment,
+          isLegalEntity: orderData.isLegalEntity,
+          orgInn: orderData.orgInn, // Добавлено поле организации/ИНН
+          // payment: orderData.payment, // убрано, т.к. оплаты нет
+          items: cart.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
+          total: cart.reduce((sum, i) => sum + i.price + i.quantity, 0),
+          date: new Date().toLocaleString('ru-RU'),
+        };
+        const updatedOrders = [...orders, newOrder];
+        setOrders(updatedOrders);
+        localStorage.setItem('orders', JSON.stringify(updatedOrders));
+        setCart([]);
+        localStorage.setItem('cart', '[]');
+        setTimeout(() => setOrderSuccess(false), 3000);
+      })
+      .catch(err => {
+        setOrderLoading(false);
+        alert('Не удалось отправить заказ исполнителю в Telegram. Попробуйте позже.');
+      });
+  }
+
+  // Оставляем useEffect для сохранения изменений, внесенных через админ-панель, в localStorage
   useEffect(() => {
     localStorage.setItem('catalog', JSON.stringify(catalogData));
   }, [catalogData]);
@@ -447,11 +604,20 @@ export default function App() {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
+  // Сохраняем user в localStorage
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('user');
+    }
+  }, [user]);
+
   // ==== Все уникальные категории ====
   const allCategories = [...new Set(catalogData.map(p => p.category))];
 
   // ==== Поиск по сайту (названия и характеристики) ====
-// (searchQuery уже есть в состоянии)
+  // (searchQuery уже есть в состоянии)
 
   // ==== Уникальные ключи характеристик ====
   const specKeys = [];
@@ -591,135 +757,364 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
-  switch (currentHash) {
-    case 'main':
-      return (
-        <div className="bg-gray-100 min-h-screen font-sans">
-          <Header totalAmount={totalAmount} />
-          <SiteSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-          <MainPage />
-          <Footer />
-        </div>
-      );
-    case 'about':
-      return (
-        <div className="bg-gray-100 min-h-screen font-sans">
-          <Header totalAmount={totalAmount} />
-          <SiteSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-          <AboutPage />
-          <Footer />
-        </div>
-      );
-    case 'contact':
-      return (
-        <div className="bg-gray-100 min-h-screen font-sans">
-          <Header totalAmount={totalAmount} />
-          <SiteSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-          <ContactPage />
-          <Footer />
-        </div>
-      );
-    case 'cart':
-      return (
-        <div className="bg-gray-100 min-h-screen font-sans">
-          <Header totalAmount={totalAmount} />
-          <SiteSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-          <CartPage
-            cart={cart}
-            updateQuantity={updateQuantity}
-            total={totalAmount}
-            removeFromCart={removeFromCart}
-          />
-          <Footer />
-        </div>
-      );
-    case 'kateh':
-      return (
-        <div className="bg-gray-100 min-h-screen font-sans">
-          <Header totalAmount={totalAmount} />
-          <SiteSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-          <AdminPage catalogData={catalogData} setCatalogData={setCatalogData} />
-          <Footer />
-        </div>
-      );
-    case 'home':
-    default:
-      return (
-        <div className="bg-gray-100 min-h-screen font-sans">
-          <Header totalAmount={totalAmount} />
-          <SiteSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-          <HomePage
-            products={applyFilters()}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            categoryFilter={categoryFilter}
-            setCategoryFilter={setCategoryFilter}
-            searchCategoryFilter={searchCategoryFilter}         // <-- new prop
-            setSearchCategoryFilter={setSearchCategoryFilter}   // <-- new prop
-            categories={allCategories}
-            showFilters={showFilters}
-            setShowFilters={setShowFilters}
-            selectedProduct={selectedProduct}
-            setSelectedProduct={setSelectedProduct}
-            addToCart={addToCart}
-            cart={cart}
-            updateQuantity={updateQuantity}
-            getQuantityInCart={getQuantityInCart}
-            specKeys={specKeys}
-            setSpecFilters={setSpecFilters}
-            specFilters={specFilters}
-            getSpecValues={getSpecValues}
-          />
-          <Footer />
-        </div>
-      );
+  // --- добавляем процедуру сброса каталога ---
+  function resetCatalog() {
+    localStorage.removeItem('catalog');
+    setCatalogData(initialCatalog);
+    window.location.reload();
   }
-}
+  // --- конец добавления ---
 
-// ==== Шапка сайта ====
-function Header({ totalAmount }) {
-  const goTo = (page) => {
-    window.location.hash = page;
-  };
+  // --- ПРОВЕРКА ДАННЫХ НА ВХОДЕ: логируем обязательные характеристики для всех товаров ---
+  useEffect(() => {
+    catalogData.forEach(product => {
+      const req = getRequiredSpecsForCategory(product.category);
+      // eslint-disable-next-line no-console
+      console.debug('Product:', product.name, '| Category:', product.category, '| Required specs:', req);
+    });
+  }, [catalogData]);
 
-  // При нажатии на "Каталог" сбрасываем выбор категорий
-  return (
-    <header className="bg-white shadow sticky top-0 z-20">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-        <div className="flex items-center space-x-3">
+  // Для отладки: выводим весь catalogData при каждом рендере
+  useEffect(() => {
+    console.log('catalogData (products on site):', catalogData);
+  }, [catalogData]);
+
+  // ==== МОДАЛЬНОЕ ОКНО ЛОГИНА ====
+  function LoginModal({ onLogin, onClose, error, registerButton }) {
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50" onClick={onClose}>
+        <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-xs relative" onClick={e => e.stopPropagation()} onKeyDown={handleKeyDown} tabIndex={0}>
+          <button onClick={onClose} className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
+          <h2 className="text-xl font-bold mb-4 text-blue-700">Вход</h2>
+          <input
+            type="text"
+            placeholder="Логин"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg p-2.5 mb-3"
+          />
+          <input
+            type="password"
+            placeholder="Пароль"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg p-2.5 mb-3"
+          />
+          {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
           <button
-            onClick={() => goTo('main')}
-            className="text-2xl font-extrabold text-blue-700 tracking-tight hover:underline focus:outline-none"
-            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-            aria-label="На главную"
-          >
-            ElectroShop
-          </button>
+            onClick={() => onLogin(username, password)}
+            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
+          >Войти</button>
+          {registerButton}
         </div>
-        <nav className="flex space-x-2 md:space-x-6">
-          <button
-            onClick={() => {
-              goTo('home');
-              // Сброс выбора категорий при переходе в каталог
-              window.dispatchEvent(new CustomEvent('reset-category-path'));
-            }}
-            className="font-medium text-gray-600 hover:text-blue-600 transition"
-          >
-            Каталог
-          </button>
-          <button onClick={() => goTo('about')} className="font-medium text-gray-600 hover:text-blue-600 transition">О нас</button>
-          <button onClick={() => goTo('contact')} className="font-medium text-gray-600 hover:text-blue-600 transition">Связаться</button>
-          <button onClick={() => goTo('cart')} className="relative font-medium text-gray-600 hover:text-blue-600 transition">
-            Корзина
-            {totalAmount > 0 && (
-              <span className="absolute -top-2 -right-3 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow">
-                {totalAmount}
-              </span>
-            )}
-          </button>
-        </nav>
       </div>
-    </header>
+    );
+  }
+
+  // ==== МОДАЛЬНОЕ ОКНО РЕГИСТРАЦИИ ====
+  function RegisterModal({ onRegister, onClose, error }) {
+    const [username, setUsername] = React.useState('');
+    const [password, setPassword] = React.useState('');
+    const [name, setName] = React.useState('');
+    // Роль не выбирается, всегда 'покупатель'
+
+    React.useEffect(() => {
+      const handleEsc = (e) => {
+        if (e.key === 'Escape') onClose();
+      };
+      window.addEventListener('keydown', handleEsc);
+      return () => window.removeEventListener('keydown', handleEsc);
+    }, [onClose]);
+
+    // Добавляем обработчик Enter
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        onRegister({ username, password, name });
+      }
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50" onClick={onClose}>
+        <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-xs relative" onClick={e => e.stopPropagation()} onKeyDown={handleKeyDown} tabIndex={0}>
+          <button onClick={onClose} className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
+          <h2 className="text-xl font-bold mb-4 text-blue-700">Регистрация</h2>
+          <input
+            type="text"
+            placeholder="Логин"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg p-2.5 mb-3"
+          />
+          <input
+            type="password"
+            placeholder="Пароль"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg p-2.5 mb-3"
+          />
+          <input
+            type="text"
+            placeholder="Имя"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg p-2.5 mb-3"
+          />
+          {/* select для роли убран */}
+          {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
+          <button
+            onClick={() => onRegister({ username, password, name })}
+            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
+          >Зарегистрироваться</button>
+        </div>
+      </div>
+    );
+  }
+
+  // Функция логина
+  function handleLogin(username, password) {
+    const users = getUsers();
+    const found = users.find(u => u.username === username && u.password === password);
+    if (found) {
+      setUser(found);
+      localStorage.setItem('user', JSON.stringify(found));
+      setShowLogin(false);
+      setLoginError('');
+    } else {
+      setLoginError('Неверный логин или пароль');
+    }
+  }
+  // Функция регистрации
+  function handleRegister({ username, password, name }) {
+    if (!username || !password || !name) {
+      setRegisterError('Заполните все поля');
+      return;
+    }
+    const users = getUsers();
+    if (users.some(u => u.username === username)) {
+      setRegisterError('Пользователь с таким логином уже существует');
+      return;
+    }
+    const newUser = { username, password, name, role: 'покупатель' };
+    const updatedUsers = [...users, newUser];
+    setUsers(updatedUsers);
+    setUser(newUser);
+    localStorage.setItem('user', JSON.stringify(newUser));
+    setShowRegister(false);
+    setRegisterError('');
+    setShowLogin(false);
+    setLoginError('');
+  }
+  // Функция выхода
+  function handleLogout() {
+    setUser(null);
+    localStorage.removeItem('user');
+  }
+
+  // ==== Шапка сайта ====
+  function Header({ totalAmount, user, onLogin, onLogout }) {
+    const goTo = (page) => {
+      window.location.hash = page;
+    };
+    return (
+      <header className="bg-white shadow sticky top-0 z-20">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => goTo('main')}
+              className="text-2xl font-extrabold text-blue-700 tracking-tight hover:underline focus:outline-none"
+              style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+              aria-label="На главную"
+            >
+              ElectroShop
+            </button>
+          </div>
+          <nav className="flex space-x-2 md:space-x-6 items-center">
+            <button
+              onClick={() => {
+                goTo('home');
+                window.dispatchEvent(new CustomEvent('reset-category-path'));
+              }}
+              className="font-medium text-gray-600 hover:text-blue-600 transition"
+            >
+              Каталог
+            </button>
+            <button onClick={() => goTo('about')} className="font-medium text-gray-600 hover:text-blue-600 transition">О нас</button>
+            <button onClick={() => goTo('contact')} className="font-medium text-gray-600 hover:text-blue-600 transition">Связаться</button>
+            <button onClick={() => goTo('cart')} className="relative font-medium text-gray-600 hover:text-blue-600 transition">
+              Корзина
+              {totalAmount > 0 && (
+                <span className="absolute -top-2 -right-3 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow">
+                  {totalAmount}
+                </span>
+              )}
+            </button>
+            {user && (
+              <button onClick={() => goTo('orders')} className="font-medium text-gray-600 hover:text-blue-600 transition">Мои заказы</button>
+            )}
+            {/* === Кнопка админ-панели только для админа === */}
+            {user?.role === 'админ' && (
+              <button
+                onClick={() => goTo('kateh')}
+                className="font-medium text-red-600 hover:text-red-800 transition border border-red-200 rounded px-3 py-1 ml-2"
+              >
+                Админ-панель
+              </button>
+            )}
+            {/* === Авторизация === */}
+            {user ? (
+              <div className="flex items-center space-x-2 ml-4">
+                <span className="text-gray-700 text-sm font-semibold">
+                  {user.name}
+                  {user.role !== 'покупатель' && (
+                    <> ({user.role})</>
+                  )}
+                </span>
+                <button
+                  onClick={onLogout}
+                  className="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm"
+                >Выйти</button>
+              </div>
+            ) : (
+              <button
+                onClick={onLogin}
+                className="ml-4 px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+              >Войти</button>
+            )}
+          </nav>
+        </div>
+      </header>
+    );
+  }
+
+  // --- Вставляем LoginModal и RegisterModal ---
+  return (
+    <>
+      {showLogin && (
+        <LoginModal
+          onLogin={handleLogin}
+          onClose={() => { setShowLogin(false); setLoginError(''); }}
+          error={loginError}
+          registerButton={<button className="mt-2 w-full px-4 py-2 bg-gray-200 text-blue-700 rounded-lg hover:bg-gray-300 font-semibold" onClick={() => { setShowLogin(false); setShowRegister(true); setLoginError(''); }}>Регистрация</button>}
+        />
+      )}
+      {showRegister && (
+        <RegisterModal
+          onRegister={handleRegister}
+          onClose={() => { setShowRegister(false); setRegisterError(''); }}
+          error={registerError}
+        />
+      )}
+      {/* Ниже — основной switch по currentHash, не трогаем */}
+      {(() => {
+        switch (currentHash) {
+          case 'main':
+            return (
+              <div className="bg-gray-100 min-h-screen font-sans">
+                <Header totalAmount={totalAmount} user={user} onLogin={() => setShowLogin(true)} onLogout={handleLogout} />
+                <MainPage />
+              </div>
+            );
+          case 'home':
+            return (
+              <div className="bg-gray-100 min-h-screen font-sans">
+                <Header totalAmount={totalAmount} user={user} onLogin={() => setShowLogin(true)} onLogout={handleLogout} />
+                <HomePage
+                  products={filteredProducts}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  categoryFilter={categoryFilter}
+                  setCategoryFilter={setCategoryFilter}
+                  searchCategoryFilter={searchCategoryFilter}
+                  setSearchCategoryFilter={setSearchCategoryFilter}
+                  categories={allCategories}
+                  showFilters={showFilters}
+                  setShowFilters={setShowFilters}
+                  selectedProduct={selectedProduct}
+                  setSelectedProduct={setSelectedProduct}
+                  addToCart={addToCart}
+                  cart={cart}
+                  updateQuantity={updateQuantity}
+                  getQuantityInCart={getQuantityInCart}
+                  specKeys={specKeys}
+                  setSpecFilters={setSpecFilters}
+                  specFilters={specFilters}
+                  getSpecValues={getSpecValues}
+                />
+              </div>
+            );
+          case 'about':
+            return (
+              <div className="bg-gray-100 min-h-screen font-sans">
+                <Header totalAmount={totalAmount} user={user} onLogin={() => setShowLogin(true)} onLogout={handleLogout} />
+                <AboutPage />
+              </div>
+            );
+          case 'contact':
+            return (
+              <div className="bg-gray-100 min-h-screen font-sans">
+                <Header totalAmount={totalAmount} user={user} onLogin={() => setShowLogin(true)} onLogout={handleLogout} />
+                <ContactPage />
+              </div>
+            );
+          case 'cart':
+            return (
+              <div className="bg-gray-100 min-h-screen font-sans">
+                <Header totalAmount={totalAmount} user={user} onLogin={() => setShowLogin(true)} onLogout={handleLogout} />
+                <CartPage
+                  cart={cart}
+                  updateQuantity={updateQuantity}
+                  total={totalAmount}
+                  removeFromCart={removeFromCart}
+                  setShowOrder={setShowOrder}
+                />
+              </div>
+            );
+          case 'kateh':
+            return (
+              <div className="bg-gray-100 min-h-screen font-sans">
+                <Header totalAmount={totalAmount} user={user} onLogin={() => setShowLogin(true)} onLogout={handleLogout} />
+                {user?.role === 'админ' ? (
+                  <AdminPage catalogData={catalogData} setCatalogData={setCatalogData} resetCatalog={resetCatalog} />
+                ) : (
+                  <div className="max-w-2xl mx-auto mt-20 p-8 bg-white rounded-xl shadow text-center text-xl text-red-600 font-semibold">
+                    Доступ к админ-панели разрешён только администратору.
+                  </div>
+                )}
+              </div>
+            );
+          case 'orders':
+            return (
+              <div className="bg-gray-100 min-h-screen font-sans">
+                <Header totalAmount={totalAmount} user={user} onLogin={() => setShowLogin(true)} onLogout={handleLogout} />
+                <OrdersPage orders={orders} user={user} />
+              </div>
+            );
+          default:
+            return (
+              <div className="bg-gray-100 min-h-screen font-sans">
+                <Header totalAmount={totalAmount} user={user} onLogin={() => setShowLogin(true)} onLogout={handleLogout} />
+                <MainPage />
+              </div>
+            );
+        }
+      })()}
+      {/* ВАЖНО: Не используйте showOrder, orderSuccess, orderLoading вне компонента App! */}
+      {/* Все состояния должны использоватьаться только внутри App и его потомков через пропсы. */}
+      {showOrder && (
+        <OrderModal
+          onClose={() => setShowOrder(false)}
+          onSubmit={handleOrderSubmit}
+          loading={orderLoading}
+        />
+      )}
+      {orderSuccess && (
+        <div className="fixed top-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-50 text-lg font-semibold">
+          Заказ успешно оформлен!
+        </div>
+      )}
+    </>
   );
 }
 
@@ -1196,10 +1591,36 @@ function ProductCard({ product, onSelect, quantityInCart, onAdd, onDecrement, on
   const handleDecrement = React.useCallback((e) => { e.stopPropagation(); onDecrement(product); }, [onDecrement, product]);
   const handleIncrement = React.useCallback((e) => { e.stopPropagation(); onIncrement(product); }, [onIncrement, product]);
 
+  // Получаем список обязательных характеристик для категории (как в ProductSpecifications)
+  const requiredSpecsList = categorySpecs[product.category] || [];
+  const productSpecsMap = {};
+  (product.specs || []).forEach(s => { productSpecsMap[s.key] = s.value; });
+
+  // Формируем массив обязательных характеристик (с плейсхолдером 'н/д')
+  const requiredList = requiredSpecsList.map(spec => ({
+    key: spec.key,
+    value: productSpecsMap[spec.key] !== undefined && productSpecsMap[spec.key] !== '' ? productSpecsMap[spec.key] : 'н/д'
+  }));
+  // Дополнительные характеристики (не обязательные)
+  const additionalList = (product.specs || [])
+    .filter(s => !requiredSpecsList.some(rs => rs.key === s.key))
+    .map(s => ({ key: s.key, value: s.value !== undefined && s.value !== '' ? s.value : 'н/д' }));
+
+  // Сначала обязательные, затем дополнительные (до 3-х всего)
+  let visibleSpecs = [];
+  if (requiredList.length >= 3) {
+    visibleSpecs = requiredList.slice(0, 3);
+  } else {
+    visibleSpecs = [
+      ...requiredList,
+      ...additionalList.slice(0, 3 - requiredList.length)
+    ];
+  }
+
   return (
     <div
       className="bg-white rounded-2xl shadow-lg overflow-hidden transition-transform duration-200 hover:shadow-2xl hover:-translate-y-2 flex flex-col h-full border border-gray-200 cursor-pointer"
-      onClick={handleSelect}
+      onClick={() => onSelect(product)}
       tabIndex={0}
       style={{ willChange: 'transform, box-shadow' }}
     >
@@ -1212,23 +1633,30 @@ function ProductCard({ product, onSelect, quantityInCart, onAdd, onDecrement, on
         <div className="flex-grow">
           <h3 className="text-lg font-bold text-gray-900 mb-2">{product.name}</h3>
           <span className="text-blue-700 font-bold text-xl">{product.price} ₽</span>
+          <ul className="mt-2 text-gray-700 text-sm space-y-1">
+            {visibleSpecs.map((spec, idx) => (
+              <li key={idx}>
+                <strong>{spec.key}:</strong> {spec.value}
+              </li>
+            ))}
+          </ul>
         </div>
         <div className="mt-4 flex items-center justify-end space-x-2">
           {quantityInCart > 0 ? (
             <>
               <button
-                onClick={handleDecrement}
+                onClick={e => { e.stopPropagation(); onDecrement(product); }}
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors duration-150 text-lg font-semibold"
               >-</button>
               <span className="w-8 text-center font-semibold text-gray-800">{quantityInCart}</span>
               <button
-                onClick={handleIncrement}
+                onClick={e => { e.stopPropagation(); onIncrement(product); }}
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors duration-150 text-lg font-semibold"
               >+</button>
             </>
           ) : (
             <button
-              onClick={handleAdd}
+              onClick={e => { e.stopPropagation(); onAdd(product); }}
               className="px-5 py-2.5 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-150 font-medium"
             >
               В корзину
@@ -1241,44 +1669,49 @@ function ProductCard({ product, onSelect, quantityInCart, onAdd, onDecrement, on
 }
 
 // ==== Компонент характеристик товара ====
-function ProductSpecifications({ specs }) {
-  const [showAll, setShowAll] = useState(false);
-  const visibleSpecs = showAll ? specs : specs.slice(0, 3);
+function ProductSpecifications({ specs, category }) {
+  // Обязательные: только те, что есть в categorySpecs.js для этой категории
+  const requiredSpecsList = categorySpecs[category] || [];
+  const productSpecsMap = {};
+  (specs || []).forEach(s => { productSpecsMap[s.key] = s.value; });
+
+  // Обязательные: всегда выводим все из categorySpecs.js, даже если их нет в товаре (тогда value = 'н/д')
+  const requiredSpecs = requiredSpecsList.map(spec => ({
+    key: spec.key,
+    value: productSpecsMap[spec.key] !== undefined && productSpecsMap[spec.key] !== '' ? productSpecsMap[spec.key] : 'н/д',
+    unit: spec.unit || ''
+  }));
+  // Дополнительные: только те, которых нет в categorySpecs.js
+  const additionalSpecs = (specs || [])
+    .filter(s => !requiredSpecsList.some(rs => rs.key === s.key))
+    .map(s => ({ key: s.key, value: s.value, unit: '' }));
+
+  // Итоговый массив: сначала обязательные, затем дополнительные
+  const allSpecs = [...requiredSpecs, ...additionalSpecs];
+
+  const [showAll, setShowAll] = React.useState(false);
+  let visibleSpecs;
+  if (showAll) {
+    visibleSpecs = allSpecs;
+  } else if (requiredSpecs.length >= 3) {
+    visibleSpecs = requiredSpecs.slice(0, 3);
+  } else {
+    visibleSpecs = [
+      ...requiredSpecs,
+      ...additionalSpecs.slice(0, 3 - requiredSpecs.length)
+    ];
+  }
 
   return (
     <div className="max-h-32 overflow-y-auto">
       <ul className="list-disc list-inside text-gray-700 space-y-1">
-        {visibleSpecs.map((spec, index) => (
-          <li key={index}>
-            <strong>{spec.key}:</strong> {spec.value}
-          </li>
+        {visibleSpecs.map((spec, idx) => (
+          <li key={idx}><b>{spec.key}:</b> {spec.value}{spec.unit ? ` ${spec.unit}` : ''}</li>
         ))}
       </ul>
-      {specs.length > 3 && (
-        <button
-          onClick={() => setShowAll(!showAll)}
-          className="mt-2 text-blue-600 hover:underline text-sm"
-        >
-          {showAll ? "Скрыть все" : "Показать все"}
-        </button>
-      )}
-    </div>
-  );
-}
-
-function ProductDescription({ description }) {
-  const [showAll, setShowAll] = useState(false);
-  const visibleDescription = showAll ? description : description.slice(0, 200);
-
-  return (
-    <div className="max-h-32 overflow-y-auto">
-      <p className="text-gray-700">{visibleDescription}{!showAll && description.length > 200 && "..."}</p>
-      {description.length > 200 && (
-        <button
-          onClick={() => setShowAll(!showAll)}
-          className="mt-2 text-blue-600 hover:underline text-sm"
-        >
-          {showAll ? "Скрыть все" : "Показать все"}
+      {allSpecs.length > 3 && (
+        <button className="text-blue-600 text-xs mt-1" onClick={() => setShowAll(v => !v)}>
+          {showAll ? 'Скрыть' : 'Показать все'}
         </button>
       )}
     </div>
@@ -1334,28 +1767,10 @@ function ProductModal({ product, onClose }) {
               )}
             </div>
             {/* Specifications Section */}
-            {product.specs && product.specs.length > 0 && (
-              <div>
-                <p className="font-semibold text-gray-800 mb-2">Характеристики:</p>
-                <ul className="list-disc list-inside text-gray-700 space-y-1">
-                  {(showFullSpecs ? product.specs : product.specs.slice(0, 3)).map(
-                    (spec, index) => (
-                      <li key={index}>
-                        <strong>{spec.key}:</strong> {spec.value}
-                      </li>
-                    )
-                  )}
-                </ul>
-                {product.specs.length > 3 && (
-                  <button
-                    onClick={() => setShowFullSpecs(!showFullSpecs)}
-                    className="mt-2 text-blue-600 hover:underline text-sm"
-                  >
-                    {showFullSpecs ? "Скрыть все" : "Показать все"}
-                  </button>
-                )}
-              </div>
-            )}
+            <div>
+              <p className="font-semibold text-gray-800 mb-2">Характеристики:</p>
+              <ProductSpecifications specs={product.specs} category={product.category} />
+            </div>
           </div>
           <p className="mt-4 text-xl font-bold text-blue-700">Цена: {product.price} ₽</p>
         </div>
@@ -1398,163 +1813,316 @@ function MainPage() {
 const CATEGORY_TREE = [
   {
     name: "Кабель и провод",
+    code: "1K",
     children: [
-      { name: "Кабель силовой" },
-      { name: "Кабель монтажный" },
-      { name: "Провода и шнуры" },
-      { name: "Провода для ЛЭП" },
+      { name: "Кабель силовой", code: "1KS" },
+      { name: "Кабель монтажный", code: "1KM" },
+      { name: "Провода и шнуры", code: "1KP" },
+      { name: "Провода для ЛЭП", code: "1KL" },
     ],
   },
   {
+    // TODO: Переименовать "Прокладка кабеля" в будущем
     name: "Прокладка кабеля",
+    code: "2L",
     children: [
       {
-        name: "Лотки и шинопровод",
+        name: "Лотки",
+        code: "2LL",
         children: [
-          { name: "Лотки перфорированные" },
-          { name: "Лотки неперфорированные" },
-          { name: "Лотки лестничные" },
-          { name: "Шинопровод" },
+          { name: "Лотки перфорированные", code: "2LLP" },
+          { name: "Лотки неперфорированные", code: "2LLN" },
+          { name: "Лотки лестничные", code: "2LLL" },
         ],
       },
-      { name: "Распределительные коробки" },
-      { name: "Разьемы" },
+      { name: "Шинопровод", code: "2LH" },
+      { name: "Распределительные коробки", code: "2LK" },
+      { name: "Разьемы", code: "2LR" },
     ],
   },
   {
     name: "Светотехника",
+    code: "3S",
     children: [
       {
         name: "Светильники",
+        code: "3SS",
         children: [
           {
             name: "Светильники для внутреннего освещения",
+            code: "3SSI",
             children: [
-              { name: "Офисные светильники" },
-              { name: "Даунлайт светильники" },
-              { name: "Трековые светильники" },
-              { name: "ЖКХ светильники" },
-              { name: "Бытовые светильники" },
-              { name: "Настольные светильники" },
-              { name: "Точечные светильники" },
-              { name: "Светильники накладные бытовые" },
+              { name: "Офисные светильники", code: "3SSIF" },
+              { name: "Даунлайт светильники", code: "3SSID" },
+              { name: "Трековые светильники", code: "3SSIT" },
+              { name: "ЖКХ светильники", code: "3SSIJ" },
+              { name: "Бытовые светильники", code: "3SSIB" },
+              { name: "Настольные светильники", code: "3SSIN" },
+              { name: "Точечные светильники", code: "3SSIR" },
             ],
-          },
-          {
+                   },
+                   {
             name: "Светильники для наружнего освещения",
+            code: "3SSO",
             children: [
-              { name: "Дорожные светильники" },
-              { name: "Парковые светильники" },
-              { name: "Садовые светильники" },
-              { name: "Прожекторы" },
-              { name: "Переносные светильники" },
-              { name: "Декоративный свет" },
+              { name: "Дорожные светильники", code: "3SSOW" },
+              { name: "Парковые светильники", code: "3SSOD" },
+              { name: "Садовые светильники", code: "3SSOS" },
+              { name: "Прожекторы", code: "3SSOP" },
+              { name: "Переносные светильники", code: "3SSOU" },
+              { name: "Декоративный свет", code: "3SSOK" },
             ],
           },
         ],
       },
-      { name: "Лампы" },
+      { name: "Лампы", code: "3SL" },
       {
         name: "Аксессуары для светильников",
+        code: "3SA",
         children: [
-          { name: "Драйверы" },
-          { name: "Патроны, ламподержатели" },
-          { name: "Прочее" },
+          { name: "Драйверы", code: "3SAD" },
+          { name: "Патроны, ламподержатели", code: "3SAP" },
+          { name: "Прочее", code: "3SAA" },
         ],
       },
     ],
   },
   {
     name: "Электроустановочные изделия",
+    code: "4U",
     children: [
       {
         name: "Скрытого монтажа",
+        code: "4US",
         children: [
-          { name: "Розетки" },
-          { name: "Выключатели и переключатели" },
-          { name: "Светорегуляторы (диммеры)" },
-          { name: "Терморегуляторы" },
-          { name: "Кнопки" },
+          { name: "Розетки", code: "4USR" },
+          { name: "Выключатели и переключатели", code: "4USV" },
+          { name: "Светорегуляторы (диммеры)", code: "4USS" },
+          { name: "Терморегуляторы", code: "4UST" },
+          { name: "Кнопки", code: "4USK" },
         ],
       },
       {
         name: "Открытого монтажа",
+        code: "4UO",
         children: [
-          { name: "Розетки" },
-          { name: "Выключатели и переключатели" },
-          { name: "Светорегуляторы (диммеры)" },
-          { name: "Терморегуляторы" },
-          { name: "Кнопки" },
+          { name: "Розетки", code: "4UOR" },
+          { name: "Выключатели и переключатели", code: "4UOV" },
+          { name: "Светорегуляторы (диммеры)", code: "4UOS" },
+          { name: "Терморегуляторы", code: "4UOT" },
+          { name: "Кнопки", code: "4UOK" },
         ],
       },
-      { name: "Аксессуары для электроустановочных изделий" },
+      { name: "Аксессуары для электроустановочных изделий", code: "4UA" },
       {
         name: "Коробки установочные",
+        code: "4UK",
         children: [
-          { name: "Для установки в бетон" },
-          { name: "Для установки в полые стены" },
-          { name: "Переходные коробки для наружнего монтажа" },
+          { name: "Для установки в бетон", code: "4UKB" },
+          { name: "Для установки в полые стены", code: "4UKG" },
+          { name: "Переходные коробки для наружнего монтажа", code: "4UKP" },
         ],
       },
       {
         name: "Передвижные установки",
+        code: "4UP",
         children: [
-          { name: "Удлинители" },
-          { name: "Сетевые фильтры" },
-          { name: "Переходники" },
-          { name: "Вилки" },
+          { name: "Удлинители", code: "4UPU" },
+          { name: "Сетевые фильтры", code: "4UPF" },
+          { name: "Переходники", code: "4UPP" },
+          { name: "Вилки", code: "4UPV" },
         ],
       },
     ],
   },
   {
     name: "Низковольтное оборудование",
+    code: "5A",
     children: [
       {
         name: "Аппараты защиты",
+        code: "5AZ",
         children: [
-          { name: "Автоматические выключатели" },
-          { name: "Дифференциальная защита (УЗО, ДифБлоки)" },
-          { name: "Вспомогательные элементы" },
+          { name: "Автоматические выключатели", code: "5AZA" },
+          { name: "Дифференциальная защита (УЗО, ДифБлоки)", code: "5AZU" },
+          { name: "Вспомогательные элементы", code: "5AZV" },
         ],
       },
-      { name: "Пускатели, контакторы" },
-      { name: "Рубильники" },
+      { name: "Пускатели, контакторы", code: "5AP" },
+      { name: "Рубильники", code: "5AR" },
       {
         name: "Счетчики электроэнергии",
+        code: "5AS",
         children: [
-          { name: "Однофазные" },
-          { name: "Трехфазные" },
+          { name: "Однофазные", code: "5AS1" },
+          { name: "Трехфазные", code: "5AS3" },
         ],
       },
-      { name: "Кнопки" },
-      { name: "Трансформаторы" },
-      { name: "Измерительные приборы" },
+      { name: "Кнопки", code: "5AK" },
+      { name: "Трансформаторы", code: "5AT" },
+      { name: "Измерительные приборы", code: "5AI" },
     ],
   },
   {
     name: "Щитовое оборудование",
+    code: "6H",
     children: [
       {
         name: "Щиты электрические",
+        code: "6HE",
         children: [
-          { name: "Щитовые корпусы пластиковые" },
-          { name: "Щитовые корпусы металлические" },
+          {
+            name: "Щитовые корпусы",
+            code: "6HEK",
+            children: [
+              { name: "Щитовые корпусы пластиковые", code: "6HEKP" },
+              { name: "Щитовые корпусы металлические", code: "6HEKM" },
+            ],
+          },
+          { name: "Щиты в сборе", code: "6HES" },
         ],
       },
-      { name: "Щиты в сборе" },
-      { name: "Аксессуары для щитового оборудования" },
-      { name: "Шины" },
-      { name: "Клеммы" },
+      { name: "Аксессуары для щитового оборудования", code: "6HA" },
+      { name: "Шины", code: "6HH" },
+      { name: "Клеммы", code: "6HK" },
     ],
   },
   {
     name: "Инструмент",
+    code: "7I",
     children: [
-      { name: "Ручной инструмент" },
-      { name: "Сварочное оборудование" },
-      { name: "Паяльное оборудование" },
-      { name: "Строительное оборудование" },
+      { name: "Ручной инструмент", code: "7IR" },
+      { name: "Сварочное оборудование", code: "7IS" },
+      { name: "Паяльное оборудование", code: "7IP" },
+      { name: "Строительное оборудование", code: "7IB" },
     ],
   },
 ];
+
+// ==== МОДАЛЬНОЕ ОКНО ОФОРМЛЕНИЯ ЗАКАЗА ====
+function OrderModal({ onClose, onSubmit, loading }) {
+  const [name, setName] = React.useState('');
+  const [phone, setPhone] = React.useState('');
+  const [address, setAddress] = React.useState('');
+  const [comment, setComment] = React.useState('');
+  const [isLegalEntity, setIsLegalEntity] = React.useState(false);
+  const [orgInn, setOrgInn] = React.useState('');
+  const [error, setError] = React.useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!name || !phone || !address) {
+      setError('Пожалуйста, заполните все обязательные поля.');
+      return;
+    }
+    if (isLegalEntity && !orgInn) {
+      setError('Пожалуйста, укажите организацию/ИНН.');
+      return;
+    }
+    setError('');
+    onSubmit({ name, phone, address, comment, isLegalEntity, orgInn });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50" onClick={onClose}>
+      <form
+        className="bg-white rounded-xl shadow-xl p-8 w-full max-w-md relative"
+        onClick={e => e.stopPropagation()}
+        onSubmit={handleSubmit}
+      >
+        <button onClick={onClose} type="button" className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
+        <h2 className="text-xl font-bold mb-4 text-blue-700">Оформление заказа</h2>
+        <div className="mb-4 text-gray-700 text-sm bg-blue-50 rounded p-3">
+          После оформления заявки вам перезвонит менеджер. Если вы юридическое лицо/ИП, можно обсудить специальные условия.
+        </div>
+        <input
+          type="text"
+          placeholder="ФИО"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg p-2.5 mb-3"
+          required
+        />
+        <input
+          type="tel"
+          placeholder="Телефон"
+          value={phone}
+          onChange={e => setPhone(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg p-2.5 mb-3"
+          required
+        />
+        <input
+          type="text"
+          placeholder="Адрес доставки"
+          value={address}
+          onChange={e => setAddress(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg p-2.5 mb-3"
+          required
+        />
+        <textarea
+          placeholder="Комментарий к заказу (необязательно)"
+          value={comment}
+          onChange={e => setComment(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg p-2.5 mb-3"
+        />
+        <label className="flex items-center mb-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={isLegalEntity}
+            onChange={e => setIsLegalEntity(e.target.checked)}
+            className="mr-2"
+          />
+          <span>Я юридическое лицо/ИП</span>
+        </label>
+        {isLegalEntity && (
+          <input
+            type="text"
+            placeholder="Организация/ИНН"
+            value={orgInn}
+            onChange={e => setOrgInn(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg p-2.5 mb-3"
+            required
+          />
+        )}
+        {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
+        <button
+          type="submit"
+          className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold mt-2 disabled:opacity-60"
+          disabled={loading}
+        >
+          {loading ? 'Отправка...' : 'Оформить заказ'}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+// ==== СТРАНИЦА МОИХ ЗАКАЗОВ ====
+function OrdersPage({ orders, user }) {
+  const userOrders = orders.filter(o => o.username === user?.username);
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-12">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Мои заказы</h1>
+      {userOrders.length === 0 ? (
+        <p className="text-gray-600">У вас пока нет заказов.</p>
+      ) : (
+        <div className="space-y-6">
+          {userOrders.map((order, idx) => (
+            <div key={idx} className="bg-white rounded-xl shadow p-6 border border-gray-200">
+              <div className="mb-2 text-gray-700 text-sm">Заказ от {order.date}</div>
+              <div className="mb-2"><b>Имя:</b> {order.name}</div>
+              <div className="mb-2"><b>Адрес:</b> {order.address}</div>
+              <div className="mb-2"><b>Состав заказа:</b></div>
+              <ul className="list-disc list-inside text-gray-700 mb-2">
+                {order.items.map((item, i) => (
+                  <li key={i}>{item.name} — {item.quantity} шт. × {item.price} ₽</li>
+                ))}
+              </ul>
+              <div className="font-bold text-blue-700">Сумма: {order.total} ₽</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
